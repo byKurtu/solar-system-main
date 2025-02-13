@@ -323,7 +323,6 @@ img{
     }
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
     #info {
         max-width: 250px;
