@@ -7,19 +7,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loading">Yükleniyor...</div>
+    
     <div id="info">
-        <h1>Solar System Simulation</h1>
+        <h1>Solar System</h1>
         <div id="controls">
-            <label>Simulation Speed:
-                <input type="range" id="timeScale" min="0" max="2" step="0.1" value="1">
-            </label>
-            <button id="pausePlay">Pause</button>
+            <div class="time-controls">
+                <button id="rewindTime">◄◄</button>
+                <button id="pausePlay">Pause</button>
+                <button id="forwardTime">►►</button>
+            </div>
+            <div class="speed-control">
+                <label for="timeScale">Simulation Speed</label>
+                <input type="range" id="timeScale" min="0" max="5" step="0.1" value="1">
+            </div>
+            <div class="date-control">
+                <input type="date" id="simulationDate">
+                <button id="goToDate">Go to Date</button>
+            </div>
             <button id="resetCamera">Reset Camera</button>
         </div>
         <div id="planetInfo"></div>
     </div>
     <canvas id="solarSystem"></canvas>
-    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
