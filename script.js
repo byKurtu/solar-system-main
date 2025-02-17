@@ -289,9 +289,8 @@ class SolarSystemSimulation {
         
         document.getElementById('goToDate').addEventListener('click', () => {
             const targetDate = new Date(dateInput.value);
-            const timeDiff = (targetDate - this.currentDate) / 1000; // difference in seconds
+            const timeDiff = (targetDate - this.currentDate) / 1000; 
             
-            // Adjust planet positions based on time difference
             for (const [name, planet] of this.planets) {
                 const angleChange = (timeDiff / CELESTIAL_BODIES[name].orbitalPeriod) * 2 * Math.PI;
                 planet.angle += angleChange;
@@ -323,7 +322,6 @@ class SolarSystemSimulation {
         const planet = CELESTIAL_BODIES[planetName];
         const infoDiv = document.getElementById('planetInfo');
         
-        // Add compare button
         const compareButton = document.createElement('button');
         compareButton.textContent = 'Karşılaştır';
         compareButton.onclick = () => this.comparePlanets(planetName);
@@ -341,7 +339,6 @@ class SolarSystemSimulation {
     }
     
     comparePlanets(selectedPlanet) {
-        // Create comparison modal
         const modal = document.createElement('div');
         modal.className = 'planet-comparison modal';
         
@@ -391,7 +388,6 @@ class SolarSystemSimulation {
         
         document.body.appendChild(modal);
         
-        // Update comparison when planet selection changes
         const select = modal.querySelector('#comparePlanet');
         const updateComparison = () => {
             const comparePlanet = CELESTIAL_BODIES[select.value];
@@ -403,16 +399,14 @@ class SolarSystemSimulation {
         };
         
         select.addEventListener('change', updateComparison);
-        updateComparison(); // Initial update
+        updateComparison(); 
         
-        // Close modal when clicking outside or on close button
         modal.addEventListener('click', (e) => {
             if (e.target === modal || e.target.classList.contains('close-modal')) {
                 document.body.removeChild(modal);
             }
         });
         
-        // Prevent clicks inside modal content from closing the modal
         modal.querySelector('.modal-content').addEventListener('click', (e) => {
             e.stopPropagation();
         });
@@ -425,7 +419,6 @@ class SolarSystemSimulation {
             const deltaTime = this.clock.getDelta() * this.timeScale * this.timeDirection;
             this.currentDate = new Date(this.currentDate.getTime() + deltaTime * 1000);
             
-            // Update date input to show current simulation date
             document.getElementById('simulationDate').valueAsDate = this.currentDate;
             
             for (const [name, planet] of this.planets) {
@@ -434,45 +427,36 @@ class SolarSystemSimulation {
                 planet.mesh.position.z = Math.sin(planet.angle) * planet.distance;
                 planet.mesh.rotation.y += deltaTime;
                 
-                // Update Moon position relative to Earth
                 if (name === 'earth') {
                     this.moonData.angle += deltaTime * 0.5 * this.moonData.speed;
                     
-                    // Update moon orbit position to follow Earth
                     this.moonOrbit.position.x = planet.mesh.position.x;
                     this.moonOrbit.position.z = planet.mesh.position.z;
                     
-                    // Calculate moon position relative to Earth
                     const moonX = Math.cos(this.moonData.angle) * this.moonData.distance;
                     const moonZ = Math.sin(this.moonData.angle) * this.moonData.distance;
                     
-                    // Set moon position relative to Earth
                     this.moon.position.x = planet.mesh.position.x + moonX;
                     this.moon.position.z = planet.mesh.position.z + moonZ;
                     this.moon.rotation.y += deltaTime;
                 }
                 
-                // Update Jupiter's moons
                 if (name === 'jupiter' && this.jupiterMoons) {
                     this.jupiterMoons.forEach(moon => {
                         moon.angle += deltaTime * 0.5 * moon.speed;
                         
-                        // Update moon orbit position to follow Jupiter
                         moon.orbit.position.x = planet.mesh.position.x;
                         moon.orbit.position.z = planet.mesh.position.z;
                         
-                        // Calculate moon position relative to Jupiter
                         const moonX = Math.cos(moon.angle) * moon.distance;
                         const moonZ = Math.sin(moon.angle) * moon.distance;
                         
-                        // Set moon position relative to Jupiter
                         moon.mesh.position.x = planet.mesh.position.x + moonX;
                         moon.mesh.position.z = planet.mesh.position.z + moonZ;
                         moon.mesh.rotation.y += deltaTime;
                     });
                 }
                 
-                // Update trail
                 const trail = this.planetTrails.get(name);
                 if (trail) {
                     trail.positions.push(new THREE.Vector3(
@@ -497,7 +481,6 @@ class SolarSystemSimulation {
                 }
             }
             
-            // Animate asteroid belt
             this.asteroidBelt.children.forEach(asteroid => {
                 asteroid.userData.angle += deltaTime * 0.1 * asteroid.userData.speed;
                 asteroid.position.x = Math.cos(asteroid.userData.angle) * asteroid.userData.distance;
@@ -532,7 +515,6 @@ class SolarSystemSimulation {
         const presetData = this.cameraPresets[preset];
         
         if (preset === 'earthView') {
-            // Update Earth view position based on current Earth position
             const earth = this.planets.get('earth');
             if (earth) {
                 const offset = new THREE.Vector3(0, 10, 30);
@@ -541,17 +523,15 @@ class SolarSystemSimulation {
             }
         }
         
-        // Animate camera movement
         const startPosition = this.camera.position.clone();
         const startTarget = this.controls.target.clone();
-        const duration = 1000; // 1 second
+        const duration = 1000; 
         const startTime = Date.now();
         
         const animateCamera = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Smooth easing
             const eased = 1 - Math.pow(1 - progress, 3);
             
             this.camera.position.lerpVectors(startPosition, presetData.position, eased);
