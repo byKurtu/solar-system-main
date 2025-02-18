@@ -4,6 +4,64 @@ const SCALE_FACTOR = 100000000;
 const EARTH_YEAR = 31557600; 
 const TIME_STEP = 86400; 
 
+const PLANET_DATA = {
+    mercury: {
+        name: "Merkür",
+        mass: "3.285 × 10^23",
+        diameter: "4,879",
+        orbitalPeriod: "88",
+        averageTemp: "167"
+    },
+    venus: {
+        name: "Venüs",
+        mass: "4.867 × 10^24",
+        diameter: "12,104",
+        orbitalPeriod: "225",
+        averageTemp: "464"
+    },
+    earth: {
+        name: "Dünya",
+        mass: "5.972 × 10^24",
+        diameter: "12,742",
+        orbitalPeriod: "365",
+        averageTemp: "15"
+    },
+    mars: {
+        name: "Mars",
+        mass: "6.39 × 10^23",
+        diameter: "6,779",
+        orbitalPeriod: "687",
+        averageTemp: "-63"
+    },
+    jupiter: {
+        name: "Jüpiter",
+        mass: "1.898 × 10^27",
+        diameter: "139,820",
+        orbitalPeriod: "4,333",
+        averageTemp: "-110"
+    },
+    saturn: {
+        name: "Satürn",
+        mass: "5.683 × 10^26",
+        diameter: "116,460",
+        orbitalPeriod: "10,759",
+        averageTemp: "-140"
+    },
+    uranus: {
+        name: "Uranüs",
+        mass: "8.681 × 10^25",
+        diameter: "50,724",
+        orbitalPeriod: "30,687",
+        averageTemp: "-195"
+    },
+    neptune: {
+        name: "Neptün",
+        mass: "1.024 × 10^26",
+        diameter: "49,244",
+        orbitalPeriod: "60,190",
+        averageTemp: "-200"
+    }
+};
 
 const CELESTIAL_BODIES = {
     sun: {

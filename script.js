@@ -47,6 +47,9 @@ class SolarSystemSimulation {
         
         this.setupCameraControls();
         this.animate();
+        
+        // Global erişim için instance'ı kaydet
+        window.solarSystemSimulation = this;
     }
     
     setupScene() {
@@ -238,7 +241,7 @@ class SolarSystemSimulation {
         
         document.getElementById('pausePlay').addEventListener('click', () => {
             this.paused = !this.paused;
-            document.getElementById('pausePlay').textContent = this.paused ? 'Play' : 'Pause';
+            document.getElementById('pausePlay').textContent = this.paused ? 'Oynat' : 'Durdur';
         });
         
         document.getElementById('resetCamera').addEventListener('click', () => {
@@ -248,17 +251,20 @@ class SolarSystemSimulation {
         });
         
         window.addEventListener('click', (event) => {
+            event.preventDefault();
+            
             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             
             this.raycaster.setFromCamera(this.mouse, this.camera);
             
-            const intersects = this.raycaster.intersectObjects(this.scene.children);
+            const planetObjects = Array.from(this.planets.values()).map(planet => planet.mesh);
+            const intersects = this.raycaster.intersectObjects(planetObjects);
             
             if (intersects.length > 0) {
                 const clickedObject = intersects[0].object;
                 for (const [name, planet] of this.planets) {
-                    if (planet.mesh === clickedObject) {
+                    if (planet.mesh === clickedObject || planet.mesh.children.includes(clickedObject)) {
                         this.showPlanetInfo(name);
                         break;
                     }
@@ -272,7 +278,7 @@ class SolarSystemSimulation {
             this.timeDirection = -1;
             if (this.paused) {
                 this.paused = false;
-                document.getElementById('pausePlay').textContent = 'Pause';
+                document.getElementById('pausePlay').textContent = 'Durdur';
             }
         });
         
@@ -280,7 +286,7 @@ class SolarSystemSimulation {
             this.timeDirection = 1;
             if (this.paused) {
                 this.paused = false;
-                document.getElementById('pausePlay').textContent = 'Pause';
+                document.getElementById('pausePlay').textContent = 'Durdur';
             }
         });
         
@@ -289,9 +295,8 @@ class SolarSystemSimulation {
         
         document.getElementById('goToDate').addEventListener('click', () => {
             const targetDate = new Date(dateInput.value);
-            const timeDiff = (targetDate - this.currentDate) / 1000; // difference in seconds
+            const timeDiff = (targetDate - this.currentDate) / 1000; 
             
-            // Adjust planet positions based on time difference
             for (const [name, planet] of this.planets) {
                 const angleChange = (timeDiff / CELESTIAL_BODIES[name].orbitalPeriod) * 2 * Math.PI;
                 planet.angle += angleChange;
@@ -320,102 +325,97 @@ class SolarSystemSimulation {
     }
     
     showPlanetInfo(planetName) {
-        const planet = CELESTIAL_BODIES[planetName];
-        const infoDiv = document.getElementById('planetInfo');
-        
-        // Add compare button
-        const compareButton = document.createElement('button');
-        compareButton.textContent = 'Karşılaştır';
-        compareButton.onclick = () => this.comparePlanets(planetName);
-        
-        infoDiv.innerHTML = `
-            <h3>${planet.name}</h3>
-            <p>Kütle<span>${(planet.mass / 1e24).toFixed(2)} × 10²⁴ kg</span></p>
-            <p>Yarıçap<span>${planet.radius.toFixed(0)} km</span></p>
-            <p>Yörünge Periyodu<span>${(planet.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</span></p>
-            <p>Eksen Eğikliği<span>${planet.axisTilt.toFixed(2)}°</span></p>
-            <p>Dönüş Periyodu<span>${(planet.rotationPeriod / 86400).toFixed(2)} Dünya Günü</span></p>
+        const planetInfoDiv = document.getElementById('planetInfo');
+        if (!planetName) {
+            planetInfoDiv.style.display = 'none';
+            return;
+        }
+
+        const planet = PLANET_DATA[planetName];
+        planetInfoDiv.innerHTML = `
+            <div class="info-header">
+                <h2>${planet.name}</h2>
+                <button class="close-btn" onclick="document.getElementById('planetInfo').style.display='none'">×</button>
+            </div>
+            <p>Çap: ${planet.diameter} km</p>
+            <p>Kütle: ${planet.mass} kg</p>
+            <p>Yörünge Süresi: ${planet.orbitalPeriod} gün</p>
+            <p>Ortalama Sıcaklık: ${planet.averageTemp}°C</p>
+            <button onclick="window.solarSystemSimulation.comparePlanets('${planetName}')">Karşılaştır</button>
         `;
-        infoDiv.appendChild(compareButton);
-        infoDiv.classList.add('visible');
+        planetInfoDiv.style.display = 'block';
     }
     
     comparePlanets(selectedPlanet) {
-        // Create comparison modal
-        const modal = document.createElement('div');
-        modal.className = 'planet-comparison modal';
-        
-        const planets = Object.keys(CELESTIAL_BODIES).filter(name => name !== 'sun');
-        const compareWith = planets.filter(name => name !== selectedPlanet);
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2>Gezegen Karşılaştırması</h2>
-                <div class="comparison-controls">
-                    <select id="comparePlanet">
-                        ${compareWith.map(name => `<option value="${name}">${CELESTIAL_BODIES[name].name}</option>`).join('')}
+        // Eğer zaten bir karşılaştırma penceresi varsa kaldır
+        const existingCompare = document.querySelector('.compare-window');
+        if (existingCompare) {
+            document.body.removeChild(existingCompare);
+        }
+
+        const compareDiv = document.createElement('div');
+        compareDiv.className = 'compare-window';
+        compareDiv.innerHTML = `
+            <div class="compare-header">
+                <h2>Gezegen Karşılaştırma</h2>
+                <button class="close-btn" onclick="this.closest('.compare-window').remove()">×</button>
+            </div>
+            <div class="compare-content">
+                <div class="planet-select">
+                    <h3>Karşılaştırılacak gezegeni seçin:</h3>
+                    <select id="comparePlanetSelect">
+                        ${Object.keys(PLANET_DATA)
+                            .filter(name => name !== selectedPlanet)
+                            .map(name => `<option value="${name}">${PLANET_DATA[name].name}</option>`)
+                            .join('')}
                     </select>
                 </div>
+                <div id="comparisonResult"></div>
+            </div>
+        `;
+        
+        document.body.appendChild(compareDiv);
+        
+        const select = compareDiv.querySelector('#comparePlanetSelect');
+        const updateComparison = () => {
+            const selectedPlanetData = PLANET_DATA[selectedPlanet];
+            const comparePlanetData = PLANET_DATA[select.value];
+            
+            compareDiv.querySelector('#comparisonResult').innerHTML = `
                 <div class="comparison-table">
                     <table>
                         <tr>
                             <th>Özellik</th>
-                            <th>${CELESTIAL_BODIES[selectedPlanet].name}</th>
-                            <th id="comparePlanetName"></th>
+                            <th>${selectedPlanetData.name}</th>
+                            <th>${comparePlanetData.name}</th>
                         </tr>
                         <tr>
-                            <td>Kütle (10²⁴ kg)</td>
-                            <td>${(CELESTIAL_BODIES[selectedPlanet].mass / 1e24).toFixed(2)}</td>
-                            <td id="compareMass"></td>
+                            <td>Kütle</td>
+                            <td>${selectedPlanetData.mass} kg</td>
+                            <td>${comparePlanetData.mass} kg</td>
                         </tr>
                         <tr>
-                            <td>Yarıçap (km)</td>
-                            <td>${CELESTIAL_BODIES[selectedPlanet].radius.toFixed(0)}</td>
-                            <td id="compareRadius"></td>
+                            <td>Çap</td>
+                            <td>${selectedPlanetData.diameter} km</td>
+                            <td>${comparePlanetData.diameter} km</td>
                         </tr>
                         <tr>
-                            <td>Yörünge Periyodu (Dünya Yılı)</td>
-                            <td>${(CELESTIAL_BODIES[selectedPlanet].orbitalPeriod / EARTH_YEAR).toFixed(2)}</td>
-                            <td id="compareOrbit"></td>
+                            <td>Yörünge Süresi</td>
+                            <td>${selectedPlanetData.orbitalPeriod} gün</td>
+                            <td>${comparePlanetData.orbitalPeriod} gün</td>
                         </tr>
                         <tr>
-                            <td>Eksen Eğikliği (°)</td>
-                            <td>${CELESTIAL_BODIES[selectedPlanet].axisTilt.toFixed(2)}</td>
-                            <td id="compareAxisTilt"></td>
+                            <td>Ortalama Sıcaklık</td>
+                            <td>${selectedPlanetData.averageTemp}°C</td>
+                            <td>${comparePlanetData.averageTemp}°C</td>
                         </tr>
                     </table>
                 </div>
-                <button class="close-modal">Kapat</button>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // Update comparison when planet selection changes
-        const select = modal.querySelector('#comparePlanet');
-        const updateComparison = () => {
-            const comparePlanet = CELESTIAL_BODIES[select.value];
-            modal.querySelector('#comparePlanetName').textContent = comparePlanet.name;
-            modal.querySelector('#compareMass').textContent = (comparePlanet.mass / 1e24).toFixed(2);
-            modal.querySelector('#compareRadius').textContent = comparePlanet.radius.toFixed(0);
-            modal.querySelector('#compareOrbit').textContent = (comparePlanet.orbitalPeriod / EARTH_YEAR).toFixed(2);
-            modal.querySelector('#compareAxisTilt').textContent = comparePlanet.axisTilt.toFixed(2);
+            `;
         };
         
         select.addEventListener('change', updateComparison);
-        updateComparison(); // Initial update
-        
-        // Close modal when clicking outside or on close button
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal || e.target.classList.contains('close-modal')) {
-                document.body.removeChild(modal);
-            }
-        });
-        
-        // Prevent clicks inside modal content from closing the modal
-        modal.querySelector('.modal-content').addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        updateComparison(); // İlk karşılaştırmayı göster
     }
     
     animate() {
@@ -425,7 +425,6 @@ class SolarSystemSimulation {
             const deltaTime = this.clock.getDelta() * this.timeScale * this.timeDirection;
             this.currentDate = new Date(this.currentDate.getTime() + deltaTime * 1000);
             
-            // Update date input to show current simulation date
             document.getElementById('simulationDate').valueAsDate = this.currentDate;
             
             for (const [name, planet] of this.planets) {
@@ -434,45 +433,36 @@ class SolarSystemSimulation {
                 planet.mesh.position.z = Math.sin(planet.angle) * planet.distance;
                 planet.mesh.rotation.y += deltaTime;
                 
-                // Update Moon position relative to Earth
                 if (name === 'earth') {
                     this.moonData.angle += deltaTime * 0.5 * this.moonData.speed;
                     
-                    // Update moon orbit position to follow Earth
                     this.moonOrbit.position.x = planet.mesh.position.x;
                     this.moonOrbit.position.z = planet.mesh.position.z;
                     
-                    // Calculate moon position relative to Earth
                     const moonX = Math.cos(this.moonData.angle) * this.moonData.distance;
                     const moonZ = Math.sin(this.moonData.angle) * this.moonData.distance;
                     
-                    // Set moon position relative to Earth
                     this.moon.position.x = planet.mesh.position.x + moonX;
                     this.moon.position.z = planet.mesh.position.z + moonZ;
                     this.moon.rotation.y += deltaTime;
                 }
                 
-                // Update Jupiter's moons
                 if (name === 'jupiter' && this.jupiterMoons) {
                     this.jupiterMoons.forEach(moon => {
                         moon.angle += deltaTime * 0.5 * moon.speed;
                         
-                        // Update moon orbit position to follow Jupiter
                         moon.orbit.position.x = planet.mesh.position.x;
                         moon.orbit.position.z = planet.mesh.position.z;
                         
-                        // Calculate moon position relative to Jupiter
                         const moonX = Math.cos(moon.angle) * moon.distance;
                         const moonZ = Math.sin(moon.angle) * moon.distance;
                         
-                        // Set moon position relative to Jupiter
                         moon.mesh.position.x = planet.mesh.position.x + moonX;
                         moon.mesh.position.z = planet.mesh.position.z + moonZ;
                         moon.mesh.rotation.y += deltaTime;
                     });
                 }
                 
-                // Update trail
                 const trail = this.planetTrails.get(name);
                 if (trail) {
                     trail.positions.push(new THREE.Vector3(
@@ -497,7 +487,6 @@ class SolarSystemSimulation {
                 }
             }
             
-            // Animate asteroid belt
             this.asteroidBelt.children.forEach(asteroid => {
                 asteroid.userData.angle += deltaTime * 0.1 * asteroid.userData.speed;
                 asteroid.position.x = Math.cos(asteroid.userData.angle) * asteroid.userData.distance;
@@ -514,10 +503,10 @@ class SolarSystemSimulation {
         const cameraButtons = document.createElement('div');
         cameraButtons.className = 'camera-presets';
         cameraButtons.innerHTML = `
-            <button id="overviewCamera">Overview</button>
-            <button id="topDownCamera">Top Down</button>
-            <button id="sideViewCamera">Side View</button>
-            <button id="earthViewCamera">Earth View</button>
+            <button id="overviewCamera">Genel Bakış</button>
+            <button id="topDownCamera">Kuş Bakışı</button>
+            <button id="sideViewCamera">Yan Bakış</button>
+            <button id="earthViewCamera">Dünya Bakışı</button>
         `;
         document.getElementById('controls').appendChild(cameraButtons);
         
@@ -532,7 +521,6 @@ class SolarSystemSimulation {
         const presetData = this.cameraPresets[preset];
         
         if (preset === 'earthView') {
-            // Update Earth view position based on current Earth position
             const earth = this.planets.get('earth');
             if (earth) {
                 const offset = new THREE.Vector3(0, 10, 30);
@@ -541,17 +529,15 @@ class SolarSystemSimulation {
             }
         }
         
-        // Animate camera movement
         const startPosition = this.camera.position.clone();
         const startTarget = this.controls.target.clone();
-        const duration = 1000; // 1 second
+        const duration = 1000; 
         const startTime = Date.now();
         
         const animateCamera = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Smooth easing
             const eased = 1 - Math.pow(1 - progress, 3);
             
             this.camera.position.lerpVectors(startPosition, presetData.position, eased);

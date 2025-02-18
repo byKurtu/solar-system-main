@@ -175,6 +175,7 @@ button:hover {
     width: 150px;
     height: 5px;
     -webkit-appearance: none;
+    appearance: none;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
     outline: none;
@@ -691,4 +692,138 @@ img{
 
 #loading.hidden {
     display: none;
+}
+
+.creator-info {
+    margin: 10px 0;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.creator-info p {
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+}
+
+.creator-info a {
+    color: #4a9eff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.creator-info a:hover {
+    text-decoration: underline;
+}
+
+.info-header, .compare-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #ff4444;
+}
+
+.compare-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.compare-content {
+    margin-top: 15px;
+}
+
+.planet-select {
+    margin-bottom: 15px;
+}
+
+.planet-select select {
+    width: 100%;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+#comparisonResult p {
+    margin: 5px 0;
+}
+
+.compare-window select {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.compare-window select:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.compare-window select option {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 8px;
+}
+
+.compare-window h3 {
+    color: #ffd700;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.comparison-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table table {
+    width: 100%;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-table th {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.comparison-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
