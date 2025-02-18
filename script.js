@@ -325,6 +325,7 @@ class SolarSystemSimulation {
     }
     
     showPlanetInfo(planetName) {
+<<<<<<< HEAD
         const planetInfoDiv = document.getElementById('planetInfo');
         if (!planetName) {
             planetInfoDiv.style.display = 'none';
@@ -342,11 +343,28 @@ class SolarSystemSimulation {
             <p>Yörünge Süresi: ${planet.orbitalPeriod} gün</p>
             <p>Ortalama Sıcaklık: ${planet.averageTemp}°C</p>
             <button onclick="window.solarSystemSimulation.comparePlanets('${planetName}')">Karşılaştır</button>
+=======
+        const planet = CELESTIAL_BODIES[planetName];
+        const infoDiv = document.getElementById('planetInfo');
+        
+        const compareButton = document.createElement('button');
+        compareButton.textContent = 'Karşılaştır';
+        compareButton.onclick = () => this.comparePlanets(planetName);
+        
+        infoDiv.innerHTML = `
+            <h3>${planet.name}</h3>
+            <p>Kütle<span>${(planet.mass / 1e24).toFixed(2)} × 10²⁴ kg</span></p>
+            <p>Yarıçap<span>${planet.radius.toFixed(0)} km</span></p>
+            <p>Yörünge Periyodu<span>${(planet.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</span></p>
+            <p>Eksen Eğikliği<span>${planet.axisTilt.toFixed(2)}°</span></p>
+            <p>Dönüş Periyodu<span>${(planet.rotationPeriod / 86400).toFixed(2)} Dünya Günü</span></p>
+>>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
         `;
         planetInfoDiv.style.display = 'block';
     }
     
     comparePlanets(selectedPlanet) {
+<<<<<<< HEAD
         // Eğer zaten bir karşılaştırma penceresi varsa kaldır
         const existingCompare = document.querySelector('.compare-window');
         if (existingCompare) {
@@ -368,6 +386,20 @@ class SolarSystemSimulation {
                             .filter(name => name !== selectedPlanet)
                             .map(name => `<option value="${name}">${PLANET_DATA[name].name}</option>`)
                             .join('')}
+=======
+        const modal = document.createElement('div');
+        modal.className = 'planet-comparison modal';
+        
+        const planets = Object.keys(CELESTIAL_BODIES).filter(name => name !== 'sun');
+        const compareWith = planets.filter(name => name !== selectedPlanet);
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2>Gezegen Karşılaştırması</h2>
+                <div class="comparison-controls">
+                    <select id="comparePlanet">
+                        ${compareWith.map(name => `<option value="${name}">${CELESTIAL_BODIES[name].name}</option>`).join('')}
+>>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
                     </select>
                 </div>
                 <div id="comparisonResult"></div>
@@ -411,11 +443,42 @@ class SolarSystemSimulation {
                         </tr>
                     </table>
                 </div>
+<<<<<<< HEAD
             `;
         };
         
         select.addEventListener('change', updateComparison);
         updateComparison(); // İlk karşılaştırmayı göster
+=======
+                <button class="close-modal">Kapat</button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const select = modal.querySelector('#comparePlanet');
+        const updateComparison = () => {
+            const comparePlanet = CELESTIAL_BODIES[select.value];
+            modal.querySelector('#comparePlanetName').textContent = comparePlanet.name;
+            modal.querySelector('#compareMass').textContent = (comparePlanet.mass / 1e24).toFixed(2);
+            modal.querySelector('#compareRadius').textContent = comparePlanet.radius.toFixed(0);
+            modal.querySelector('#compareOrbit').textContent = (comparePlanet.orbitalPeriod / EARTH_YEAR).toFixed(2);
+            modal.querySelector('#compareAxisTilt').textContent = comparePlanet.axisTilt.toFixed(2);
+        };
+        
+        select.addEventListener('change', updateComparison);
+        updateComparison(); 
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('close-modal')) {
+                document.body.removeChild(modal);
+            }
+        });
+        
+        modal.querySelector('.modal-content').addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+>>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
     }
     
     animate() {
