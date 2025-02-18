@@ -48,7 +48,6 @@ class SolarSystemSimulation {
         this.setupCameraControls();
         this.animate();
         
-        // Global erişim için instance'ı kaydet
         window.solarSystemSimulation = this;
     }
     
@@ -376,7 +375,6 @@ class SolarSystemSimulation {
         
         document.body.appendChild(compareDiv);
         
-        // Kapatma düğmesi için olay dinleyicisi
         const closeBtn = compareDiv.querySelector('.close-btn');
         closeBtn.addEventListener('click', () => {
             document.body.removeChild(compareDiv);
