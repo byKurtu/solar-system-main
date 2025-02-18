@@ -348,7 +348,7 @@ class SolarSystemSimulation {
     }
     
     comparePlanets(selectedPlanet) {
-        const existingCompare = document.querySelector('.compare-window');
+        const existingCompare = document.querySelector('.planet-comparison');
         if (existingCompare) {
             document.body.removeChild(existingCompare);
         }
@@ -361,18 +361,26 @@ class SolarSystemSimulation {
         
         compareDiv.innerHTML = `
             <div class="modal-content">
-                <h2>Gezegen Karşılaştırması</h2>
-                <div class="comparison-controls">
-                    <select id="comparePlanetSelect">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #34495e;">
+                    <h2 style="margin: 0;">Gezegen Karşılaştırması</h2>
+                    <button class="close-btn" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0 5px;">×</button>
+                </div>
+                <div class="comparison-controls" style="padding: 20px;">
+                    <select id="comparePlanetSelect" style="background-color: #2c3e50; color: white; padding: 8px; border-radius: 4px; border: 1px solid #34495e; width: 200px; margin: 10px 0;">
                         ${compareWith.map(name => `<option value="${name}">${CELESTIAL_BODIES[name].name}</option>`).join('')}
                     </select>
                 </div>
                 <div id="comparisonResult"></div>
-                <button class="close-modal">Kapat</button>
             </div>
         `;
         
         document.body.appendChild(compareDiv);
+        
+        // Kapatma düğmesi için olay dinleyicisi
+        const closeBtn = compareDiv.querySelector('.close-btn');
+        closeBtn.addEventListener('click', () => {
+            document.body.removeChild(compareDiv);
+        });
         
         const select = compareDiv.querySelector('#comparePlanetSelect');
         const updateComparison = () => {
@@ -417,7 +425,7 @@ class SolarSystemSimulation {
         updateComparison();
         
         compareDiv.addEventListener('click', (e) => {
-            if (e.target === compareDiv || e.target.classList.contains('close-modal')) {
+            if (e.target === compareDiv) {
                 document.body.removeChild(compareDiv);
             }
         });
