@@ -325,84 +325,50 @@ class SolarSystemSimulation {
     }
     
     showPlanetInfo(planetName) {
-<<<<<<< HEAD
         const planetInfoDiv = document.getElementById('planetInfo');
         if (!planetName) {
             planetInfoDiv.style.display = 'none';
             return;
         }
 
-        const planet = PLANET_DATA[planetName];
+        const planet = CELESTIAL_BODIES[planetName];
         planetInfoDiv.innerHTML = `
             <div class="info-header">
                 <h2>${planet.name}</h2>
                 <button class="close-btn" onclick="document.getElementById('planetInfo').style.display='none'">×</button>
             </div>
-            <p>Çap: ${planet.diameter} km</p>
-            <p>Kütle: ${planet.mass} kg</p>
-            <p>Yörünge Süresi: ${planet.orbitalPeriod} gün</p>
-            <p>Ortalama Sıcaklık: ${planet.averageTemp}°C</p>
+            <p>Kütle: ${(planet.mass / 1e24).toFixed(2)} × 10²⁴ kg</p>
+            <p>Yarıçap: ${planet.radius.toFixed(0)} km</p>
+            <p>Yörünge Periyodu: ${(planet.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</p>
+            <p>Eksen Eğikliği: ${planet.axisTilt.toFixed(2)}°</p>
+            <p>Dönüş Periyodu: ${(planet.rotationPeriod / 86400).toFixed(2)} Dünya Günü</p>
             <button onclick="window.solarSystemSimulation.comparePlanets('${planetName}')">Karşılaştır</button>
-=======
-        const planet = CELESTIAL_BODIES[planetName];
-        const infoDiv = document.getElementById('planetInfo');
-        
-        const compareButton = document.createElement('button');
-        compareButton.textContent = 'Karşılaştır';
-        compareButton.onclick = () => this.comparePlanets(planetName);
-        
-        infoDiv.innerHTML = `
-            <h3>${planet.name}</h3>
-            <p>Kütle<span>${(planet.mass / 1e24).toFixed(2)} × 10²⁴ kg</span></p>
-            <p>Yarıçap<span>${planet.radius.toFixed(0)} km</span></p>
-            <p>Yörünge Periyodu<span>${(planet.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</span></p>
-            <p>Eksen Eğikliği<span>${planet.axisTilt.toFixed(2)}°</span></p>
-            <p>Dönüş Periyodu<span>${(planet.rotationPeriod / 86400).toFixed(2)} Dünya Günü</span></p>
->>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
         `;
         planetInfoDiv.style.display = 'block';
     }
     
     comparePlanets(selectedPlanet) {
-<<<<<<< HEAD
-        // Eğer zaten bir karşılaştırma penceresi varsa kaldır
         const existingCompare = document.querySelector('.compare-window');
         if (existingCompare) {
             document.body.removeChild(existingCompare);
         }
 
         const compareDiv = document.createElement('div');
-        compareDiv.className = 'compare-window';
-        compareDiv.innerHTML = `
-            <div class="compare-header">
-                <h2>Gezegen Karşılaştırma</h2>
-                <button class="close-btn" onclick="this.closest('.compare-window').remove()">×</button>
-            </div>
-            <div class="compare-content">
-                <div class="planet-select">
-                    <h3>Karşılaştırılacak gezegeni seçin:</h3>
-                    <select id="comparePlanetSelect">
-                        ${Object.keys(PLANET_DATA)
-                            .filter(name => name !== selectedPlanet)
-                            .map(name => `<option value="${name}">${PLANET_DATA[name].name}</option>`)
-                            .join('')}
-=======
-        const modal = document.createElement('div');
-        modal.className = 'planet-comparison modal';
+        compareDiv.className = 'planet-comparison modal';
         
         const planets = Object.keys(CELESTIAL_BODIES).filter(name => name !== 'sun');
         const compareWith = planets.filter(name => name !== selectedPlanet);
         
-        modal.innerHTML = `
+        compareDiv.innerHTML = `
             <div class="modal-content">
                 <h2>Gezegen Karşılaştırması</h2>
                 <div class="comparison-controls">
-                    <select id="comparePlanet">
+                    <select id="comparePlanetSelect">
                         ${compareWith.map(name => `<option value="${name}">${CELESTIAL_BODIES[name].name}</option>`).join('')}
->>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
                     </select>
                 </div>
                 <div id="comparisonResult"></div>
+                <button class="close-modal">Kapat</button>
             </div>
         `;
         
@@ -410,10 +376,11 @@ class SolarSystemSimulation {
         
         const select = compareDiv.querySelector('#comparePlanetSelect');
         const updateComparison = () => {
-            const selectedPlanetData = PLANET_DATA[selectedPlanet];
-            const comparePlanetData = PLANET_DATA[select.value];
+            const selectedPlanetData = CELESTIAL_BODIES[selectedPlanet];
+            const comparePlanetData = CELESTIAL_BODIES[select.value];
             
-            compareDiv.querySelector('#comparisonResult').innerHTML = `
+            const comparisonResult = compareDiv.querySelector('#comparisonResult');
+            comparisonResult.innerHTML = `
                 <div class="comparison-table">
                     <table>
                         <tr>
@@ -423,62 +390,41 @@ class SolarSystemSimulation {
                         </tr>
                         <tr>
                             <td>Kütle</td>
-                            <td>${selectedPlanetData.mass} kg</td>
-                            <td>${comparePlanetData.mass} kg</td>
+                            <td>${(selectedPlanetData.mass / 1e24).toFixed(2)} × 10²⁴ kg</td>
+                            <td>${(comparePlanetData.mass / 1e24).toFixed(2)} × 10²⁴ kg</td>
                         </tr>
                         <tr>
-                            <td>Çap</td>
-                            <td>${selectedPlanetData.diameter} km</td>
-                            <td>${comparePlanetData.diameter} km</td>
+                            <td>Yarıçap</td>
+                            <td>${selectedPlanetData.radius.toFixed(0)} km</td>
+                            <td>${comparePlanetData.radius.toFixed(0)} km</td>
                         </tr>
                         <tr>
-                            <td>Yörünge Süresi</td>
-                            <td>${selectedPlanetData.orbitalPeriod} gün</td>
-                            <td>${comparePlanetData.orbitalPeriod} gün</td>
+                            <td>Yörünge Periyodu</td>
+                            <td>${(selectedPlanetData.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</td>
+                            <td>${(comparePlanetData.orbitalPeriod / EARTH_YEAR).toFixed(2)} Dünya Yılı</td>
                         </tr>
                         <tr>
-                            <td>Ortalama Sıcaklık</td>
-                            <td>${selectedPlanetData.averageTemp}°C</td>
-                            <td>${comparePlanetData.averageTemp}°C</td>
+                            <td>Eksen Eğikliği</td>
+                            <td>${selectedPlanetData.axisTilt.toFixed(2)}°</td>
+                            <td>${comparePlanetData.axisTilt.toFixed(2)}°</td>
                         </tr>
                     </table>
                 </div>
-<<<<<<< HEAD
             `;
         };
         
         select.addEventListener('change', updateComparison);
-        updateComparison(); // İlk karşılaştırmayı göster
-=======
-                <button class="close-modal">Kapat</button>
-            </div>
-        `;
+        updateComparison();
         
-        document.body.appendChild(modal);
-        
-        const select = modal.querySelector('#comparePlanet');
-        const updateComparison = () => {
-            const comparePlanet = CELESTIAL_BODIES[select.value];
-            modal.querySelector('#comparePlanetName').textContent = comparePlanet.name;
-            modal.querySelector('#compareMass').textContent = (comparePlanet.mass / 1e24).toFixed(2);
-            modal.querySelector('#compareRadius').textContent = comparePlanet.radius.toFixed(0);
-            modal.querySelector('#compareOrbit').textContent = (comparePlanet.orbitalPeriod / EARTH_YEAR).toFixed(2);
-            modal.querySelector('#compareAxisTilt').textContent = comparePlanet.axisTilt.toFixed(2);
-        };
-        
-        select.addEventListener('change', updateComparison);
-        updateComparison(); 
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal || e.target.classList.contains('close-modal')) {
-                document.body.removeChild(modal);
+        compareDiv.addEventListener('click', (e) => {
+            if (e.target === compareDiv || e.target.classList.contains('close-modal')) {
+                document.body.removeChild(compareDiv);
             }
         });
         
-        modal.querySelector('.modal-content').addEventListener('click', (e) => {
+        compareDiv.querySelector('.modal-content').addEventListener('click', (e) => {
             e.stopPropagation();
         });
->>>>>>> 53d82a50e3b9f84cc8f2eabf0e1eefa8b4fa26d3
     }
     
     animate() {
