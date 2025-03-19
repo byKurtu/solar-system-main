@@ -695,44 +695,25 @@ img{
 }
 
 .creator-info {
-    margin: 15px 0;
-    text-align: center;
+    margin: 10px 0;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .creator-info p {
-    margin-bottom: 10px;
-    font-size: 16px;
+    margin: 0;
     color: #fff;
+    font-size: 14px;
 }
 
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.social-link {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #fff;
+.creator-info a {
+    color: #4a9eff;
     text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    font-size: 14px;
 }
 
-.social-link:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.social-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
+.creator-info a:hover {
+    text-decoration: underline;
 }
 
 .info-header, .compare-header {
