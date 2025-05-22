@@ -1,5 +1,9 @@
 class SolarSystemSimulation {
     constructor() {
+        this.loadingScreen = document.getElementById('loadingScreen');
+        this.progressBar = document.querySelector('.progress');
+        this.loadingText = document.querySelector('.loading-text');
+        
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000000);
         this.renderer = new THREE.WebGLRenderer({
@@ -46,9 +50,40 @@ class SolarSystemSimulation {
         };
         
         this.setupCameraControls();
-        this.animate();
+        this.initializeLoading();
         
         window.solarSystemSimulation = this;
+    }
+    
+    initializeLoading() {
+        let progress = 0;
+        const loadingSteps = [
+            { text: "Evren Oluşturuluyor...", progress: 20 },
+            { text: "Gezegenler Yerleştiriliyor...", progress: 40 },
+            { text: "Yörüngeler Hesaplanıyor...", progress: 60 },
+            { text: "Fizik Motoru Başlatılıyor...", progress: 80 },
+            { text: "Simülasyon Hazırlanıyor...", progress: 100 }
+        ];
+
+        const updateLoading = () => {
+            if (progress < loadingSteps.length) {
+                const step = loadingSteps[progress];
+                this.loadingText.textContent = step.text;
+                this.progressBar.style.width = `${step.progress}%`;
+                progress++;
+                setTimeout(updateLoading, 1000);
+            } else {
+                setTimeout(() => {
+                    this.loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        this.loadingScreen.style.display = 'none';
+                        this.animate();
+                    }, 1000);
+                }, 500);
+            }
+        };
+
+        updateLoading();
     }
     
     setupScene() {
